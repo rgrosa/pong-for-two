@@ -20,8 +20,8 @@ LEFT_PLAYER_POSITION = [0, SCREEN_HEIGHT // 2 - PLAYER_HEIGHT // 2]
 RIGHT_PLAYER_POSITION = [SCREEN_WIDTH - 0 - PLAYER_WIDTH, SCREEN_HEIGHT // 2 - PLAYER_HEIGHT // 2]
 BALL_POSITION = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2]
 BALL_DIRECTION = [1, 1]
-WAS_GOAL = 0
-WAS_HIT = 0
+WAS_GOAL = 0 # TODO change the variable to boolean
+WAS_HIT = 0 # TODO change the variable to boolean
 
 # TODO use this variables to update the player score maybe increase them inside the detect_score() method
 GOAL_RIGHT_PLAYER = 0
