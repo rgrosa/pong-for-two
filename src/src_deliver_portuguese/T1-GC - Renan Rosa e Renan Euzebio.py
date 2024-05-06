@@ -3,16 +3,19 @@
 #   RENAN DA ROSA                       #
 #   RENAN EUZEBIO                       #
 #########################################
+
+# import das bibliotecas utilizadas
 from OpenGL.GL import *
 from OpenGL.GLUT import *
 import time
 
+# declaração de variaveis globais
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 PLAYER_WIDTH = 15
 PLAYER_HEIGHT = 150
 BALL_SIZE = 15
-BALL_ORIGINAL_SPEED = 1  # update the ball speed to the original value after a goal
+BALL_ORIGINAL_SPEED = 1  # Atualiza a velocidade da bola para 1 quando um gol ocorrer.
 PLAYER_SPEED = 30
 BALL_SPEED_X = 1
 BALL_SPEED_Y = 1
@@ -24,7 +27,7 @@ WAS_GOAL, WAS_HIT, GOAL_PLAYER_1, GOAL_PLAYER_2 = 0, 0, 0, 0
 SCORE = "0 : 0"
 
 
-# Utilitarian function to drawn a rectangle
+# Função utilitaria para desenhar um quadrado
 def draw_rectangle(x, y, width, height):
     glBegin(GL_QUADS)
     glVertex2f(x, y)
@@ -34,15 +37,15 @@ def draw_rectangle(x, y, width, height):
     glEnd()
 
 
-# Render the score
+# Renderizar o a string do placar
 def write_score(txt):
-    glRasterPos2f(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.1)  # text position
+    glRasterPos2f(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.1)  # posição do texto
     for i in range(len(txt)):
         char = ord(txt[i])  # ascii value
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, char)  # font being used, and the char to display
+        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, char)  # (charset utilizado, char)
 
 
-# Draw border on the screen limit
+# desenha as bordas para sinalizar o campo
 def draw_field():
     glColor3f(0.0, 0.0, 0.0)
     glLineWidth(5.0)
@@ -54,32 +57,33 @@ def draw_field():
     glEnd()
 
 
-# Draw the player paddles
+# Desenha os jogadores
 def draw_players():
     glColor3f(1.0, 1.0, 1.0)
     draw_rectangle(LEFT_PLAYER_POSITION[0], LEFT_PLAYER_POSITION[1], PLAYER_WIDTH, PLAYER_HEIGHT)
     draw_rectangle(RIGHT_PLAYER_POSITION[0], RIGHT_PLAYER_POSITION[1], PLAYER_WIDTH, PLAYER_HEIGHT)
 
 
-# Drawn the ball
+# Desenha a bola
 def draw_ball():
     glColor3f(1.0, 1.0, 1.0)
     draw_rectangle(BALL_POSITION[0] - BALL_SIZE / 2, BALL_POSITION[1] - BALL_SIZE / 2, BALL_SIZE, BALL_SIZE)
 
 
-# Update the ball location on the screen
+# Atualiza a localização da bola na tela
 def update_ball():
     global BALL_POSITION, BALL_DIRECTION
     BALL_POSITION[0] += BALL_DIRECTION[0] * BALL_SPEED_X
     BALL_POSITION[1] += BALL_DIRECTION[1] * BALL_SPEED_Y
 
 
-# Detect collision
+# Detecta colisão
 def detect_collision():
     detect_border_collision()
     detect_player_collision()
 
 
+# Detectar colisao com os jogadores
 def detect_player_collision():
     global WAS_HIT
 
@@ -94,12 +98,13 @@ def detect_player_collision():
         WAS_HIT = 1
 
 
+# Detectar colisão com as bordas de cima e baixo
 def detect_border_collision():
     if BALL_POSITION[1] <= 0 or BALL_POSITION[1] >= SCREEN_HEIGHT:
         BALL_DIRECTION[1] *= -1
 
 
-# Detect if a goal was made, and reset the variables
+# Detecta se ocorreu um gol
 def detect_score():
     if BALL_POSITION[0] < 0:
         update_score_variables(False)
@@ -107,7 +112,7 @@ def detect_score():
         update_score_variables(True)
 
 
-# Update the score variables
+# Atualiza as variaveis referentes ao gol
 def update_score_variables(has_player_one_scored):
     global BALL_POSITION, WAS_GOAL, BALL_SPEED_X, BALL_SPEED_Y, GOAL_PLAYER_2, GOAL_PLAYER_1, SCORE
     if has_player_one_scored:
@@ -115,14 +120,14 @@ def update_score_variables(has_player_one_scored):
     else:
         GOAL_PLAYER_2 += 1
 
-    SCORE = f"{GOAL_PLAYER_1} : {GOAL_PLAYER_2}"
+    SCORE = f"{GOAL_PLAYER_1} : {GOAL_PLAYER_2}"  # Atualização do placar
     BALL_POSITION = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2]
     WAS_GOAL = 2
     BALL_SPEED_X = BALL_ORIGINAL_SPEED
     BALL_SPEED_Y = BALL_ORIGINAL_SPEED
 
 
-# Player input
+# Input dos jogadores
 def keyboard(key, x, y):
     global LEFT_PLAYER_POSITION, RIGHT_PLAYER_POSITION
     if (key == b'w' or key == b'W') and (LEFT_PLAYER_POSITION[1] < SCREEN_HEIGHT - PLAYER_HEIGHT):
@@ -135,7 +140,7 @@ def keyboard(key, x, y):
         RIGHT_PLAYER_POSITION[1] -= PLAYER_SPEED
 
 
-# Halt the execution for one second to help the players to see that the goal was made
+# Para a execução da aplicação por um segundo, para ajudar os jogadores a perceber que ocorreu um gol
 def wait_ball():
     global WAS_GOAL, WAS_HIT
     if WAS_GOAL > 0:
@@ -147,7 +152,7 @@ def wait_ball():
             WAS_GOAL = 1
 
 
-# Method to increase difficulty for each player hit on the ball
+# Metodo para aumentar a dificuldade do jogo, caso um gol nao seja feito
 def increase_difficulty():
     global WAS_HIT, BALL_SIZE, BALL_SPEED_X, BALL_SPEED_Y
     if WAS_HIT == 1:
@@ -156,7 +161,7 @@ def increase_difficulty():
         BALL_SPEED_Y += 0.2
 
 
-# Display callback function
+# Funçao callback de display
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
@@ -174,10 +179,11 @@ def display():
     wait_ball()
 
 
+# inicio do opengl
 glutInit()
 glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB)
 glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT)
-glutCreateWindow(b"Pong For Two - Renan&Renan")
+glutCreateWindow(b"T1-GC Renan Rosa e Renan Euzebio")
 glutDisplayFunc(display)
 glutIdleFunc(display)
 glutKeyboardFunc(keyboard)
