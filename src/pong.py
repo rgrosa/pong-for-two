@@ -20,12 +20,7 @@ LEFT_PLAYER_POSITION = [0, SCREEN_HEIGHT // 2 - PLAYER_HEIGHT // 2]
 RIGHT_PLAYER_POSITION = [SCREEN_WIDTH - 0 - PLAYER_WIDTH, SCREEN_HEIGHT // 2 - PLAYER_HEIGHT // 2]
 BALL_POSITION = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2]
 BALL_DIRECTION = [1, 1]
-WAS_GOAL = 0 # TODO change the variable to boolean
-WAS_HIT = 0 # TODO change the variable to boolean
-
-# TODO use this variables to update the player score maybe increase them inside the detect_score() method
-GOAL_RIGHT_PLAYER = 0
-GOAL_LEFT_PLAYER = 0
+WAS_GOAL, WAS_HIT, GOAL_PLAYER_1, GOAL_PLAYER_2 = 0, 0, 0, 0
 SCORE = "0 : 0"
 
 
@@ -40,7 +35,6 @@ def draw_rectangle(x, y, width, height):
 
 
 # Render the score
-# TODO: update the score
 def write_score(txt):
     glRasterPos2f(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 1.1)  # text position
     for i in range(len(txt)):
@@ -49,15 +43,14 @@ def write_score(txt):
 
 
 # Draw border on the screen limit
-# TODO: make to upper half of the border fit inside the game screen
 def draw_field():
     glColor3f(0.0, 0.0, 0.0)
     glLineWidth(5.0)
     glBegin(GL_LINE_LOOP)
-    glVertex2f(0, 0)
-    glVertex2f(SCREEN_WIDTH, 0)
-    glVertex2f(SCREEN_WIDTH, SCREEN_HEIGHT)
-    glVertex2f(0, SCREEN_HEIGHT)
+    glVertex2f(-10, 1)
+    glVertex2f(SCREEN_WIDTH + 10, 1)
+    glVertex2f(SCREEN_WIDTH + 10, SCREEN_HEIGHT)
+    glVertex2f(-10, SCREEN_HEIGHT)
     glEnd()
 
 
@@ -68,7 +61,7 @@ def draw_players():
     draw_rectangle(RIGHT_PLAYER_POSITION[0], RIGHT_PLAYER_POSITION[1], PLAYER_WIDTH, PLAYER_HEIGHT)
 
 
-# drawn the ball
+# Drawn the ball
 def draw_ball():
     glColor3f(1.0, 1.0, 1.0)
     draw_rectangle(BALL_POSITION[0] - BALL_SIZE / 2, BALL_POSITION[1] - BALL_SIZE / 2, BALL_SIZE, BALL_SIZE)
@@ -102,12 +95,25 @@ def detect_collision():
 
 # Detect if a goal was made, and reset the variables
 def detect_score():
-    global BALL_POSITION, WAS_GOAL, BALL_SPEED_X, BALL_SPEED_Y
-    if BALL_POSITION[0] < 0 or BALL_POSITION[0] > SCREEN_WIDTH:
-        BALL_POSITION = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2]
-        WAS_GOAL = 2
-        BALL_SPEED_X = BALL_ORIGINAL_SPEED
-        BALL_SPEED_Y = BALL_ORIGINAL_SPEED
+    if BALL_POSITION[0] < 0:
+        update_score_variables(False)
+    elif BALL_POSITION[0] > SCREEN_WIDTH:
+        update_score_variables(True)
+
+
+# Update the score variables
+def update_score_variables(has_player_one_scored):
+    global BALL_POSITION, WAS_GOAL, BALL_SPEED_X, BALL_SPEED_Y, GOAL_PLAYER_2, GOAL_PLAYER_1, SCORE
+    if has_player_one_scored:
+        GOAL_PLAYER_1 += 1
+    else:
+        GOAL_PLAYER_2 += 1
+
+    SCORE = f"{GOAL_PLAYER_1} : {GOAL_PLAYER_2}"
+    BALL_POSITION = [SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2]
+    WAS_GOAL = 2
+    BALL_SPEED_X = BALL_ORIGINAL_SPEED
+    BALL_SPEED_Y = BALL_ORIGINAL_SPEED
 
 
 # Player input
@@ -125,7 +131,7 @@ def keyboard(key, x, y):
 
 # Halt the execution for one second to help the players to see that the goal was made
 def wait_ball():
-    global WAS_GOAL, WAS_HIT, SCORE
+    global WAS_GOAL, WAS_HIT
     if WAS_GOAL > 0:
         if WAS_GOAL == 1:
             WAS_GOAL = 0
@@ -144,7 +150,7 @@ def increase_difficulty():
         BALL_SPEED_Y += 0.2
 
 
-# display callback function
+# Display callback function
 def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
